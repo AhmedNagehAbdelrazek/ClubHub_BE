@@ -1,0 +1,841 @@
+openapi: 3.0.3
+info:
+  title: ClubHub API
+  version: 1.0.0-feature-001
+  description: |
+    Contract draft for Multi‑Sport Club & Court Management backend.
+    Base path uses `/api/v1` and enforces JWT bearer auth on protected routes.
+servers:
+  - url: /api/v1
+    description: Versioned API base path
+
+tags:
+  - name: Auth
+  - name: Clubs
+  - name: Courts
+  - name: Bookings
+  - name: Matches
+  - name: Memberships
+  - name: Notifications
+
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeAuth'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login and obtain JWT
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeAuth'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /clubs:
+    get:
+      tags: [Clubs]
+      summary: List clubs
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Club list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeClubList'
+    post:
+      tags: [Clubs]
+      summary: Create club (super_admin)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClubRequest'
+      responses:
+        '201':
+          description: Club created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeClub'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /clubs/{clubId}:
+    get:
+      tags: [Clubs]
+      summary: Get club details
+      parameters:
+        - $ref: '#/components/parameters/ClubId'
+      responses:
+        '200':
+          description: Club found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeClub'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Clubs]
+      summary: Update club
+      parameters:
+        - $ref: '#/components/parameters/ClubId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClubRequest'
+      responses:
+        '200':
+          description: Club updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeClub'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /clubs/{clubId}/sports:
+    post:
+      tags: [Clubs]
+      summary: Link sport to club
+      parameters:
+        - $ref: '#/components/parameters/ClubId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sportId]
+              properties:
+                sportId:
+                  type: string
+      responses:
+        '201':
+          description: Link created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeGeneric'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /clubs/{clubId}/courts:
+    get:
+      tags: [Courts]
+      summary: List courts in club
+      parameters:
+        - $ref: '#/components/parameters/ClubId'
+      responses:
+        '200':
+          description: Court list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeCourtList'
+    post:
+      tags: [Courts]
+      summary: Create court in club
+      parameters:
+        - $ref: '#/components/parameters/ClubId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCourtRequest'
+      responses:
+        '201':
+          description: Court created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeCourt'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /bookings:
+    get:
+      tags: [Bookings]
+      summary: List court bookings
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - in: query
+          name: clubId
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Booking list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeBookingList'
+    post:
+      tags: [Bookings]
+      summary: Create court booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+      responses:
+        '201':
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeBooking'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /bookings/{bookingId}:
+    patch:
+      tags: [Bookings]
+      summary: Update booking status (cancel/complete)
+      parameters:
+        - $ref: '#/components/parameters/BookingId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [cancelled, completed]
+      responses:
+        '200':
+          description: Booking updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeBooking'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /matches:
+    get:
+      tags: [Matches]
+      summary: List matches
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - in: query
+          name: clubId
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Match list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeMatchList'
+    post:
+      tags: [Matches]
+      summary: Create match
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMatchRequest'
+      responses:
+        '201':
+          description: Match created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeMatch'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /matches/{matchId}/register:
+    post:
+      tags: [Matches]
+      summary: Register current user to match
+      parameters:
+        - $ref: '#/components/parameters/MatchId'
+      responses:
+        '200':
+          description: Registration accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeGeneric'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /memberships:
+    post:
+      tags: [Memberships]
+      summary: Apply to join a club
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [clubId]
+              properties:
+                clubId:
+                  type: string
+      responses:
+        '201':
+          description: Membership application created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeMembership'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /memberships/{membershipId}/decision:
+    patch:
+      tags: [Memberships]
+      summary: Approve or reject membership (admin)
+      parameters:
+        - $ref: '#/components/parameters/MembershipId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [approved, rejected, deactivated]
+      responses:
+        '200':
+          description: Membership updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeMembership'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /notifications:
+    get:
+      tags: [Notifications]
+      summary: Get in-app notifications for current user
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Notification list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelopeNotificationList'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    ClubId:
+      in: path
+      name: clubId
+      required: true
+      schema:
+        type: string
+    BookingId:
+      in: path
+      name: bookingId
+      required: true
+      schema:
+        type: string
+    MatchId:
+      in: path
+      name: matchId
+      required: true
+      schema:
+        type: string
+    MembershipId:
+      in: path
+      name: membershipId
+      required: true
+      schema:
+        type: string
+    Page:
+      in: query
+      name: page
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      in: query
+      name: limit
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+
+  schemas:
+    SuccessEnvelopeGeneric:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          additionalProperties: true
+
+    ErrorEnvelope:
+      type: object
+      required: [status, message]
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+        code:
+          type: string
+          nullable: true
+
+    RegisterRequest:
+      type: object
+      required: [name, phone, password]
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        password:
+          type: string
+        dob:
+          type: string
+          format: date
+          nullable: true
+        gender:
+          type: string
+          nullable: true
+
+    LoginRequest:
+      type: object
+      required: [phone, password]
+      properties:
+        phone:
+          type: string
+        password:
+          type: string
+
+    AuthPayload:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        token:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        phone:
+          type: string
+        globalRole:
+          type: string
+
+    Club:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        logoUrl:
+          type: string
+          nullable: true
+        location:
+          type: string
+
+    CreateClubRequest:
+      type: object
+      required: [name, location]
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+        logoUrl:
+          type: string
+          nullable: true
+
+    UpdateClubRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+        logoUrl:
+          type: string
+          nullable: true
+
+    Court:
+      type: object
+      properties:
+        id:
+          type: string
+        clubId:
+          type: string
+        name:
+          type: string
+        capacity:
+          type: integer
+        hourlyPrice:
+          type: number
+          format: float
+
+    CreateCourtRequest:
+      type: object
+      required: [name, capacity, hourlyPrice, supportedSportIds]
+      properties:
+        name:
+          type: string
+        capacity:
+          type: integer
+        hourlyPrice:
+          type: number
+          format: float
+        supportedSportIds:
+          type: array
+          items:
+            type: string
+
+    CourtBooking:
+      type: object
+      properties:
+        id:
+          type: string
+        clubId:
+          type: string
+        courtId:
+          type: string
+        userId:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [confirmed, cancelled, completed]
+
+    CreateBookingRequest:
+      type: object
+      required: [courtId, startTime, endTime]
+      properties:
+        courtId:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        notes:
+          type: string
+          nullable: true
+
+    Match:
+      type: object
+      properties:
+        id:
+          type: string
+        clubId:
+          type: string
+        courtId:
+          type: string
+        sportId:
+          type: string
+        name:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [scheduled, cancelled, postponed, completed]
+
+    CreateMatchRequest:
+      type: object
+      required: [clubId, courtId, sportId, name, startTime, endTime, requiredPlayers, registrationOpenTime]
+      properties:
+        clubId:
+          type: string
+        courtId:
+          type: string
+        sportId:
+          type: string
+        name:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        requiredPlayers:
+          type: integer
+        registrationOpenTime:
+          type: string
+          format: date-time
+
+    Membership:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        clubId:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected, deactivated]
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        message:
+          type: string
+        sentAt:
+          type: string
+          format: date-time
+        readAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+
+    SuccessEnvelopeAuth:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/AuthPayload'
+
+    SuccessEnvelopeClub:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/Club'
+
+    SuccessEnvelopeClubList:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Club'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    SuccessEnvelopeCourt:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/Court'
+
+    SuccessEnvelopeCourtList:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Court'
+
+    SuccessEnvelopeBooking:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/CourtBooking'
+
+    SuccessEnvelopeBookingList:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourtBooking'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    SuccessEnvelopeMatch:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/Match'
+
+    SuccessEnvelopeMatchList:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Match'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    SuccessEnvelopeMembership:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/Membership'
+
+    SuccessEnvelopeNotificationList:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
