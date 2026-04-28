@@ -12,13 +12,13 @@ const validate = (req, res, next) => {
   }
 
   const formattedErrors = errors.array().map((err) => ({
-    field: err.param,
+    field: err.path || err.param,
     message: err.msg,
     value: err.value,
   }));
 
   const apiError = ApiErrors.validation('Validation failed');
-  apiError.details = formattedErrors;
+  apiError.message = formattedErrors;
 
   // Attach details to error for potential logging
   next(apiError);

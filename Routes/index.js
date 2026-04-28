@@ -1,6 +1,34 @@
 const router = require('express').Router();
 const authRoutes = require('./authRoutes');
+const membershipRoutes = require('./membershipRoutes');
+const clubRoutes = require('./clubRoutes');
+const courtRoutes = require('./courtRoutes');
+const bookingRoutes = require('./bookingRoutes');
+const matchRoutes = require('./matchRoutes');
+const sportRoutes = require('./sportRoutes');
+const trainingRoutes = require('./trainingRoutes');
+const eventRoutes = require('./eventRoutes');
+const adminRoutes = require('./adminRoutes');
+const contentRoutes = require('./contentRoutes');
+const surveyRoutes = require('./surveyRoutes');
+const playerRatingRoutes = require('./playerRatingRoutes');
+const pointsRoutes = require('./pointsRoutes');
+const notificationRoutes = require('./notificationRoutes');
 
-router.use("/auth",authRoutes);
+router.use('/auth', authRoutes);
+router.use('/memberships', membershipRoutes);
+router.use('/clubs', clubRoutes);
+router.use('/courts', courtRoutes);
+router.use('/bookings', bookingRoutes);
+router.use('/matches', matchRoutes);
+router.use('/sports', sportRoutes);
+router.use('/trainings', trainingRoutes);
+router.use('/events', eventRoutes);
+router.use('/admin', adminRoutes);
+router.use('/content', contentRoutes);
+router.use('/surveys', surveyRoutes);
+router.use('/ratings', playerRatingRoutes);
+router.use('/notifications', notificationRoutes);
+router.use('', pointsRoutes);
 
 module.exports = router;

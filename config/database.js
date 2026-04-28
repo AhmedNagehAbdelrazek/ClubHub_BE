@@ -34,6 +34,10 @@ async function validateDatabase() {
 
   try {
     await sequelize.authenticate();
+    await sequelize.sync({
+      force:false,
+      alter:true,
+    });
     console.log('Connection to database established successfully.');
   } catch (error) {
     console.error('Unable to connect to the database:', error);

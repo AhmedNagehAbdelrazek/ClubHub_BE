@@ -116,6 +116,8 @@ paths:
     patch:
       tags: [Clubs]
       summary: Update club
+      security:
+        - BearerAuth: []
       parameters:
         - $ref: '#/components/parameters/ClubId'
       requestBody:
@@ -173,94 +175,102 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessEnvelopeCourtList'
-    post:
-      tags: [Courts]
-      summary: Create court in club
-      parameters:
-        - $ref: '#/components/parameters/ClubId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateCourtRequest'
-      responses:
-        '201':
-          description: Court created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessEnvelopeCourt'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+     post:
+       tags: [Courts]
+       summary: Create court in club
+       security:
+         - BearerAuth: []
+       parameters:
+         - $ref: '#/components/parameters/ClubId'
+       requestBody:
+         required: true
+         content:
+           application/json:
+             schema:
+               $ref: '#/components/schemas/CreateCourtRequest'
+       responses:
+         '201':
+           description: Court created
+           content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/SuccessEnvelopeCourt'
+         '403':
+           $ref: '#/components/responses/Forbidden'
 
-  /bookings:
-    get:
-      tags: [Bookings]
-      summary: List court bookings
-      parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
-        - in: query
-          name: clubId
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Booking list
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessEnvelopeBookingList'
-    post:
-      tags: [Bookings]
-      summary: Create court booking
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateBookingRequest'
-      responses:
-        '201':
-          description: Booking created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessEnvelopeBooking'
+   /bookings:
+     get:
+       tags: [Bookings]
+       summary: List court bookings
+       security:
+         - BearerAuth: []
+       parameters:
+         - $ref: '#/components/parameters/Page'
+         - $ref: '#/components/parameters/Limit'
+         - in: query
+           name: clubId
+           schema:
+             type: string
+       responses:
+         '200':
+           description: Booking list
+           content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/SuccessEnvelopeBookingList'
+     post:
+       tags: [Bookings]
+       summary: Create court booking
+       security:
+         - BearerAuth: []
+       requestBody:
+         required: true
+         content:
+           application/json:
+             schema:
+               $ref: '#/components/schemas/CreateBookingRequest'
+       responses:
+         '201':
+           description: Booking created
+           content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/SuccessEnvelopeBooking'
         '409':
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/ValidationError'
 
-  /bookings/{bookingId}:
-    patch:
-      tags: [Bookings]
-      summary: Update booking status (cancel/complete)
-      parameters:
-        - $ref: '#/components/parameters/BookingId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [status]
-              properties:
-                status:
-                  type: string
-                  enum: [cancelled, completed]
-      responses:
-        '200':
-          description: Booking updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessEnvelopeBooking'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+   /bookings/{bookingId}:
+     patch:
+       tags: [Bookings]
+       summary: Update booking status (cancel/complete)
+       security:
+         - BearerAuth: []
+       parameters:
+         - $ref: '#/components/parameters/BookingId'
+       requestBody:
+         required: true
+         content:
+           application/json:
+             schema:
+               type: object
+               required: [status]
+               properties:
+                 status:
+                   type: string
+                   enum: [cancelled, completed]
+       responses:
+         '200':
+           description: Booking updated
+           content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/SuccessEnvelopeBooking'
+         '403':
+           $ref: '#/components/responses/Forbidden'
+         '404':
+           $ref: '#/components/responses/NotFound'
 
   /matches:
     get:
@@ -280,106 +290,131 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessEnvelopeMatchList'
-    post:
-      tags: [Matches]
-      summary: Create match
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateMatchRequest'
-      responses:
-        '201':
-          description: Match created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessEnvelopeMatch'
+     post:
+       tags: [Matches]
+       summary: Create match
+       security:
+         - BearerAuth: []
+       requestBody:
+         required: true
+         content:
+           application/json:
+             schema:
+               $ref: '#/components/schemas/CreateMatchRequest'
+       responses:
+         '201':
+           description: Match created
+           content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/SuccessEnvelopeMatch'
         '409':
           $ref: '#/components/responses/Conflict'
 
-  /matches/{matchId}/register:
-    post:
-      tags: [Matches]
-      summary: Register current user to match
-      parameters:
-        - $ref: '#/components/parameters/MatchId'
-      responses:
-        '200':
-          description: Registration accepted
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessEnvelopeGeneric'
-        '409':
-          $ref: '#/components/responses/Conflict'
+   /matches/{matchId}/register:
+     post:
+       tags: [Matches]
+       summary: Register current user to match
+       security:
+         - BearerAuth: []
+       parameters:
+         - $ref: '#/components/parameters/MatchId'
+       responses:
+         '200':
+           description: Registration accepted
+           content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/SuccessEnvelopeGeneric'
+         '409':
+           $ref: '#/components/responses/Conflict'
 
-  /memberships:
-    post:
-      tags: [Memberships]
-      summary: Apply to join a club
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [clubId]
-              properties:
-                clubId:
-                  type: string
-      responses:
-        '201':
-          description: Membership application created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessEnvelopeMembership'
-        '409':
-          $ref: '#/components/responses/Conflict'
+   /memberships:
+     get:
+       tags: [Memberships]
+       summary: List current user's memberships
+       security:
+         - BearerAuth: []
+       parameters:
+         - $ref: '#/components/parameters/Page'
+         - $ref: '#/components/parameters/Limit'
+       responses:
+         '200':
+           description: Membership list
+           content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/SuccessEnvelopeMembershipList'
+     post:
+       tags: [Memberships]
+       summary: Apply to join a club
+       security:
+         - BearerAuth: []
+       requestBody:
+         required: true
+         content:
+           application/json:
+             schema:
+               type: object
+               required: [clubId]
+               properties:
+                 clubId:
+                   type: string
+       responses:
+         '201':
+           description: Membership application created
+           content:
+             application/json:
+               schema:
+               $ref: '#/components/schemas/SuccessEnvelopeMembership'
+         '409':
+           $ref: '#/components/responses/Conflict'
 
-  /memberships/{membershipId}/decision:
-    patch:
-      tags: [Memberships]
-      summary: Approve or reject membership (admin)
-      parameters:
-        - $ref: '#/components/parameters/MembershipId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [status]
-              properties:
-                status:
-                  type: string
-                  enum: [approved, rejected, deactivated]
-      responses:
-        '200':
-          description: Membership updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessEnvelopeMembership'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+   /memberships/{membershipId}/decision:
+     patch:
+       tags: [Memberships]
+       summary: Approve or reject membership (admin)
+       security:
+         - BearerAuth: []
+       parameters:
+         - $ref: '#/components/parameters/MembershipId'
+       requestBody:
+         required: true
+         content:
+           application/json:
+             schema:
+               type: object
+               required: [status]
+               properties:
+                 status:
+                   type: string
+                   enum: [approved, rejected, deactivated]
+       responses:
+         '200':
+           description: Membership updated
+           content:
+             application/json:
+               schema:
+               $ref: '#/components/schemas/SuccessEnvelopeMembership'
+         '403':
+           $ref: '#/components/responses/Forbidden'
 
-  /notifications:
-    get:
-      tags: [Notifications]
-      summary: Get in-app notifications for current user
-      parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
-      responses:
-        '200':
-          description: Notification list
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessEnvelopeNotificationList'
+   /notifications:
+     get:
+       tags: [Notifications]
+       summary: Get in-app notifications for current user
+       security:
+         - BearerAuth: []
+       parameters:
+         - $ref: '#/components/parameters/Page'
+         - $ref: '#/components/parameters/Limit'
+       responses:
+         '200':
+           description: Notification list
+           content:
+             application/json:
+               schema:
+               $ref: '#/components/schemas/SuccessEnvelopeNotificationList'
 
 components:
   securitySchemes:
@@ -826,6 +861,19 @@ components:
           example: success
         data:
           $ref: '#/components/schemas/Membership'
+
+    SuccessEnvelopeMembershipList:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Membership'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
 
     SuccessEnvelopeNotificationList:
       type: object

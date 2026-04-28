@@ -43,7 +43,7 @@ function createApp() {
   app.use('/api/v1', mainRoute);
 
   app.get('/', (req, res) => {
-    res.send('Hello to Sakan Server');
+    res.send('Hello to ClubHub Server');
   });
 
   app.use(globalErrorHandler);

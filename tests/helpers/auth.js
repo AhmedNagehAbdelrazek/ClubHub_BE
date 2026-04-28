@@ -1,21 +1,23 @@
 const request = require('supertest');
 const { User } = require('../../Models');
 const bcrypt = require('bcrypt');
+const authService = require('../../Services/authService');
 
 /**
  * Create a test user and return credentials.
  */
 async function createTestUser({ name = 'Test User', phone = '+1234567890', password = 'Password123!' } = {}) {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await User.create({
-    name,
-    phone,
-    password_hash: hashedPassword,
-    global_role: 'user',
-    is_active: true,
-  });
+  const existing = await User.findOne({ where: { phone } });
+  if (existing) {
+    await existing.destroy();
+  }
 
-  return { user, password };
+  const registerResult = await authService.register({ name, phone, password });
+  return {
+    user: registerResult.user,
+    token: registerResult.token,
+    password,
+  };
 }
 
 /**

@@ -3,6 +3,7 @@ module.exports = {
   testMatch: [
     '**/tests/**/*.test.js'
   ],
+  testPathIgnorePatterns: ['[\\\\/]\\.kilo[\\\\/]', 'node_modules'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup/testEnv.js'],
   collectCoverageFrom: [
     '**/*.js',
