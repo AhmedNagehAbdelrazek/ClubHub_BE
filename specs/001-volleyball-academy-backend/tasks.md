@@ -62,12 +62,12 @@ description: "Task list for implementing Multi‑Sport Club & Court Management S
 
 **Independent Test**: A new user can register, apply to join a club, and an admin can approve the membership with correct status transitions.
 
-- [ ] T019 [P] [US1] Add integration tests for registration + membership apply/approve flow in `tests/integration/auth/registerMembership.integration.test.js`
-- [ ] T020 [US1] Extend registration fields/validation in `Models/user.js`
-- [ ] T021 [P] [US1] Create membership model and associations in `Models/Membership.js` and `Models/index.js`
-- [ ] T022 [US1] Implement registration workflow in `Services/authService.js` and `Controllers/authController.js`
-- [ ] T023 [US1] Implement membership apply/decision APIs in `Controllers/membershipController.js` and `Routes/membershipRoutes.js`
-- [ ] T024 [US1] Add registration and membership validators in `utils/validators/authValidator.js` and `utils/validators/membershipValidator.js`
+ - [X] T019 [P] [US1] Add integration tests for registration + membership apply/approve flow in `tests/integration/auth/registerMembership.integration.test.js`
+ - [X] T020 [US1] Extend registration fields/validation in `Models/user.js`
+ - [X] T021 [P] [US1] Create membership model and associations in `Models/Membership.js` and `Models/index.js`
+ - [X] T022 [US1] Implement registration workflow in `Services/authService.js` and `Controllers/authController.js`
+ - [X] T023 [US1] Implement membership apply/decision APIs in `Controllers/membershipController.js` and `Routes/membershipRoutes.js`
+ - [X] T024 [US1] Add registration and membership validators in `utils/validators/authValidator.js` and `utils/validators/membershipValidator.js`
 
 ---
 
@@ -77,12 +77,12 @@ description: "Task list for implementing Multi‑Sport Club & Court Management S
 
 **Independent Test**: Valid users receive JWT; guest/member/admin access matrix yields expected 401/403 behavior including cross-club denial for club admins.
 
-- [ ] T025 [P] [US2] Add integration tests for login and RBAC denial matrix in `tests/integration/auth/rbac.integration.test.js`
-- [ ] T026 [US2] Implement role/scope aware JWT login payload in `Services/authService.js`
-- [ ] T027 [US2] Apply route-level role guards in `Routes/authRoutes.js`, `Routes/clubRoutes.js`, `Routes/courtRoutes.js`, `Routes/bookingRoutes.js`, `Routes/matchRoutes.js`, and `Routes/index.js`
-- [ ] T028 [P] [US2] Enforce club-admin scope checks in `middlewares/clubScopeGuard.js`, `Services/clubService.js`, `Services/courtService.js`, `Services/bookingService.js`, and `Services/matchService.js`
-- [ ] T029 [US2] Add permission matrix constants in `config/constants.js`
-- [ ] T030 [US2] Align auth/RBAC contract definitions in `specs/001-volleyball-academy-backend/contracts/openapi.yaml`
+ - [X] T025 [P] [US2] Add integration tests for login and RBAC denial matrix in `tests/integration/auth/rbac.integration.test.js`
+ - [X] T026 [US2] Implement role/scope aware JWT login payload in `Services/authService.js`
+ - [X] T027 [US2] Apply route-level role guards in `Routes/authRoutes.js`, `Routes/clubRoutes.js`, `Routes/courtRoutes.js`, `Routes/bookingRoutes.js`, `Routes/matchRoutes.js`, and `Routes/index.js`
+ - [X] T028 [P] [US2] Enforce club-admin scope checks in `middlewares/clubScopeGuard.js`, `Services/clubService.js`, `Services/courtService.js`, `Services/bookingService.js`, and `Services/matchService.js`
+ - [X] T029 [US2] Add permission matrix constants in `config/constants.js`
+ - [X] T030 [US2] Align auth/RBAC contract definitions in `specs/001-volleyball-academy-backend/contracts/openapi.yaml`
 
 ---
 
@@ -92,11 +92,11 @@ description: "Task list for implementing Multi‑Sport Club & Court Management S
 
 **Independent Test**: User can request OTP/reset token, verify, reset password, and old credentials become invalid as expected.
 
-- [ ] T031 [P] [US3] Add integration tests for OTP and reset flow in `tests/integration/auth/passwordReset.integration.test.js`
-- [ ] T032 [US3] Implement OTP generation/expiry persistence in `Services/authService.js` and `Models/user.js`
-- [ ] T033 [US3] Implement forgot/reset token lifecycle in `Services/authService.js` and `Controllers/authController.js`
-- [ ] T034 [P] [US3] Add auth endpoint rate limiting middleware in `middlewares/rateLimitAuth.js` and wire in `Routes/authRoutes.js`
-- [ ] T035 [US3] Add password reset validators in `utils/validators/authValidator.js`
+ - [X] T031 [P] [US3] Add integration tests for OTP and reset flow in `tests/integration/auth/passwordReset.integration.test.js`
+ - [X] T032 [US3] Implement OTP generation/expiry persistence in `Services/authService.js` and `Models/user.js`
+ - [X] T033 [US3] Implement forgot/reset token lifecycle in `Services/authService.js` and `Controllers/authController.js`
+ - [X] T034 [P] [US3] Add auth endpoint rate limiting middleware in `middlewares/rateLimitAuth.js` and wire in `Routes/authRoutes.js`
+ - [X] T035 [US3] Add password reset validators in `utils/validators/authValidator.js`
 
 ---
 
@@ -106,14 +106,14 @@ description: "Task list for implementing Multi‑Sport Club & Court Management S
 
 **Independent Test**: Admin can create clubs/sports/courts; users can book courts; overlapping and sport-incompatible scheduling is rejected.
 
-- [ ] T036 [P] [US15] Add integration tests for club/sport/court CRUD and booking conflicts in `tests/integration/courts/clubCourtBooking.integration.test.js`
-- [ ] T037 [US15] Create club/sport/court core models in `Models/Club.js`, `Models/Sport.js`, `Models/ClubSport.js`, `Models/Court.js`, and `Models/CourtSupportedSport.js`
-- [ ] T038 [US15] Create booking model/associations in `Models/CourtBooking.js` and `Models/index.js`
-- [ ] T039 [US15] Add core domain migrations in `migrations/001-create-clubs.js`, `migrations/002-create-sports.js`, `migrations/003-create-club-sports.js`, `migrations/004-create-courts.js`, `migrations/005-create-court-supported-sports.js`, and `migrations/006-create-court-bookings.js`
-- [ ] T040 [US15] Implement club and court services with compatibility checks in `Services/clubService.js` and `Services/courtService.js`
-- [ ] T041 [US15] Implement transactional booking overlap enforcement in `Services/bookingService.js` and `Services/scheduleConflictService.js`
-- [ ] T042 [US15] Expose club/sport/court/booking endpoints in `Controllers/clubController.js`, `Controllers/courtController.js`, `Controllers/bookingController.js`, `Routes/clubRoutes.js`, `Routes/courtRoutes.js`, and `Routes/bookingRoutes.js`
-- [ ] T043 [P] [US15] Add validators for club/sport/court/booking payloads in `utils/validators/clubValidator.js`, `utils/validators/courtValidator.js`, and `utils/validators/bookingValidator.js`
+ - [X] T036 [P] [US15] Add integration tests for club/sport/court CRUD and booking conflicts in `tests/integration/courts/clubCourtBooking.integration.test.js`
+ - [X] T037 [US15] Create club/sport/court core models in `Models/Club.js`, `Models/Sport.js`, `Models/ClubSport.js`, `Models/Court.js`, and `Models/CourtSupportedSport.js`
+ - [X] T038 [US15] Create booking model/associations in `Models/CourtBooking.js` and `Models/index.js`
+ - [X] T039 [US15] Add core domain migrations in `migrations/001-create-clubs.js`, `migrations/002-create-sports.js`, `migrations/003-create-club-sports.js`, `migrations/004-create-courts.js`, `migrations/005-create-court-supported-sports.js`, and `migrations/006-create-court-bookings.js`
+ - [X] T040 [US15] Implement club and court services with compatibility checks in `Services/clubService.js` and `Services/courtService.js`
+ - [X] T041 [US15] Implement transactional booking overlap enforcement in `Services/bookingService.js` and `Services/scheduleConflictService.js`
+ - [X] T042 [US15] Expose club/sport/court/booking endpoints in `Controllers/clubController.js`, `Controllers/courtController.js`, `Controllers/bookingController.js`, `Routes/clubRoutes.js`, `Routes/courtRoutes.js`, and `Routes/bookingRoutes.js`
+ - [X] T043 [P] [US15] Add validators for club/sport/court/booking payloads in `utils/validators/clubValidator.js`, `utils/validators/courtValidator.js`, and `utils/validators/bookingValidator.js`
 
 ---
 

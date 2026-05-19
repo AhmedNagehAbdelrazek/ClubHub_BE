@@ -1,93 +1,108 @@
+const { body, validationResult } = require('express-validator');
+const { validate } = require('../middlewares/validatorMiddleware');
+const authService = require('../Services/authService');
+const { successResponse } = require('../utils/httpResponse');
+const {
+  registerValidation,
+  loginValidation,
+  forgotPasswordValidation,
+  verifyOtpValidation,
+  resetPasswordValidation,
+} = require('../utils/validators/authValidator');
 
-const asyncHandler = require("express-async-handler");
-const ApiError = require("../utils/ApiError");
-const { signin_roles } = require("../config/constants.js");
-const authService = require("../Services/authService.js");
-const User = require("../Models/user.js");
-
-// =========== Controllers ============
-
-exports.SignUp = asyncHandler(async (req, res, next) => {
-  const { username, email, role, password, phone } = req.body;
-  if (!username || !password || !phone || !role || !email) {
-    return next(new ApiError("All fields are required", 400));
+/**
+ * POST /api/v1/auth/register
+ */
+const register = [...registerValidation, validate, async (req, res, next) => {
+  try {
+    const { name, phone, password, dob, gender } = req.body;
+    const result = await authService.register({ name, phone, password, dob, gender });
+    successResponse(res, result, 201);
+  } catch (err) {
+    next(err);
   }
+}];
 
-  // validate role from the signin_roles 
-  if(!signin_roles.includes(role)){
-    return next(new ApiError(`Invalid role the role should be on of [${signin_roles.join(" - ")}]`, 400));
+/**
+ * POST /api/v1/auth/login
+ */
+const login = [...loginValidation, validate, async (req, res, next) => {
+  try {
+    const { phone, password } = req.body;
+    const result = await authService.login(phone, password);
+    successResponse(res, result, 200);
+  } catch (err) {
+    next(err);
   }
-  await authService.checkUserDoesNotExists({username, email, phone});
+}];
 
-  
-    const user = await authService.register(req.body);
-    req.userId = user.id;
-    next();
-
-});
-
-exports.sendOTP = asyncHandler(async (req, res) => {
-  let userId = req.userId;
-  console.log(Date.now());
-  console.log(new Date('2025-09-23 17:38:20.309+03').getTime());
-  console.log(new Date('2025-09-23 17:47:20.309+03').getTime() > Date.now());
-
-  if (!userId) {
-    const { email } = req.body;
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return new ApiError("User not found", 404);
+/**
+ * POST /api/v1/auth/forgot-password
+ * Initiates password reset by generating OTP.
+ */
+const forgotPassword = [
+  body('phone').notEmpty().withMessage('Phone is required'),
+  validate,
+  async (req, res, next) => {
+    try {
+      const { phone } = req.body;
+      const result = await authService.generateOtp(phone);
+      // In dev, we return OTP; in prod we would send via SMS and not return it.
+      successResponse(res, result, 200);
+    } catch (err) {
+      next(err);
     }
-    userId = user.id;
-  }
+  },
+];
 
-  await authService.sendOTP(userId);
+/**
+ * POST /api/v1/auth/verify-otp
+ * Verifies OTP and returns reset token.
+ */
+const verifyOtp = [
+  body('phone').notEmpty(),
+  body('otp').notEmpty(),
+  validate,
+  async (req, res, next) => {
+    try {
+      const { phone, otp } = req.body;
+      const result = await authService.verifyOtpAndCreateResetToken(phone, otp);
+      successResponse(res, result, 200);
+    } catch (err) {
+      next(err);
+    }
+  },
+];
 
-  res.status(200).json({
-    message: "The verify code Sent to your Email",
-  });
-});
+/**
+ * POST /api/v1/auth/reset-password
+ * Resets password using reset token.
+ */
+const resetPassword = [
+  body('token').notEmpty(),
+  body('password')
+    .notEmpty()
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters'),
+  body('confirmPassword')
+    .custom((value, { req }) => value === req.body.password)
+    .withMessage('Passwords do not match'),
+  validate,
+  async (req, res, next) => {
+    try {
+      const { token, password } = req.body;
+      const result = await authService.resetPassword(token, password);
+      successResponse(res, result, 200);
+    } catch (err) {
+      next(err);
+    }
+  },
+];
 
-exports.verifyOTP = asyncHandler(async (req, res) => {
-  // verify OTP and update user record accordingly
-  const { email, otp } = req.body;
-
-  const result = await authService.verifyOTP(email, otp);
-
-  res.status(200).json({
-    message: "OTP verified successfully",
-    ...result,
-  });
-});
-
-exports.login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-
-  const result = await authService.login(email, password);
-
-  return res.status(200).json({ ...result });
-});
-
-exports.forgotPassword = asyncHandler(async (req, res) => {
-  //get user email
-  const { email } = req.body;
-  await authService.forgotPassword(email);
-
-  res.status(200).json({
-    status: "success",
-    message: "Reset Password link sent to email",
-});
-});
-
-exports.resetPassword = asyncHandler(async (req, res) => {
-  //get the new password and the user by Token
-  const resetToken = req.query.token || req.body.token;
-  const { password } = req.body;
-  const result = await authService.resetPassword(resetToken, password);
-
-  return res.status(200).json({
-    status: "success",
-    message: "Password Reseted successfully",
-    ...result,
-  });
-});
+module.exports = {
+  register,
+  login,
+  forgotPassword,
+  verifyOtp,
+  resetPassword,
+};
