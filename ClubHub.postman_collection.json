@@ -1,0 +1,1148 @@
+{
+  "info": {
+    "name": "ClubHub API",
+    "description": "API collection for ClubHub multi-sport club management system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "clubId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "courtId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sportId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "matchId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "superAdminToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"phone\": \"+966501234567\",\n  \"password\": \"Password1\",\n  \"dob\": \"1990-05-15\",\n  \"gender\": \"male\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+966501234567\",\n  \"password\": \"Password1\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/forgot-password",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+966501234567\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/verify-otp",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+966501234567\",\n  \"otp\": \"123456\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/reset-password",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"abc123def456...\",\n  \"password\": \"NewPass1\",\n  \"confirmPassword\": \"NewPass1\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clubs",
+      "item": [
+        {
+          "name": "List Clubs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/clubs"
+          }
+        },
+        {
+          "name": "Get Club",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/clubs/:clubId"
+          }
+        },
+        {
+          "name": "Create Club",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.id) {",
+                  "        pm.collectionVariables.set('clubId', response.data.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/clubs",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Riyadh Sports Academy\",\n  \"location\": \"Riyadh, King Fahd District\",\n  \"logoUrl\": \"https://example.com/logos/riyadh-academy.png\",\n  \"settings\": {\n    \"bookingPointsEnabled\": false,\n    \"penaltyThreshold\": 3\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Club",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/clubs/:clubId",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Riyadh Sports Academy Updated\",\n  \"location\": \"Riyadh, Olaya District\",\n  \"logoUrl\": \"https://example.com/logos/riyadh-academy-v2.png\",\n  \"settings\": {\n    \"bookingPointsEnabled\": true,\n    \"penaltyThreshold\": 5\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Link Sport to Club",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/clubs/:clubId/sports",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sportId\": \"{{sportId}}\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sports",
+      "item": [
+        {
+          "name": "List Sports",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/sports"
+          }
+        },
+        {
+          "name": "Create Sport",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.id) {",
+                  "        pm.collectionVariables.set('sportId', response.data.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/sports",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Volleyball\",\n  \"iconUrl\": \"https://example.com/icons/volleyball.png\",\n  \"playersPerTeam\": 6\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Courts",
+      "item": [
+        {
+          "name": "List Courts",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/courts/{{clubId}}/courts"
+          }
+        },
+        {
+          "name": "Get Court",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/courts/:courtId"
+          }
+        },
+        {
+          "name": "Create Court",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.id) {",
+                  "        pm.collectionVariables.set('courtId', response.data.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/courts/{{clubId}}/courts",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Court A1 - Indoor Sand\",\n  \"sportIds\": [\"{{sportId}}\"],\n  \"capacity\": 12,\n  \"hourlyPrice\": 150,\n  \"surfaceType\": \"sand\",\n  \"isIndoor\": true,\n  \"description\": \"Professional indoor volleyball court with regulation sand\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Court",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/courts/:courtId",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Court A1 - Indoor Sand (Updated)\",\n  \"hourlyPrice\": 175,\n  \"isActive\": true\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Memberships",
+      "item": [
+        {
+          "name": "Apply for Membership",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/memberships",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clubId\": \"{{clubId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Memberships",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/memberships/me"
+          }
+        },
+        {
+          "name": "Get Memberships by Club",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/memberships/club/{{clubId}}"
+          }
+        },
+        {
+          "name": "Membership Decision",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/memberships/:membershipId/decision",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"approved\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "List Bookings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/bookings",
+              "query": [
+                {
+                  "key": "clubId",
+                  "value": "{{clubId}}"
+                },
+                {
+                  "key": "userId",
+                  "value": ""
+                },
+                {
+                  "key": "status",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Booking",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/bookings",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courtId\": \"{{courtId}}\",\n  \"startTime\": \"2026-05-01T09:00:00Z\",\n  \"endTime\": \"2026-05-01T10:00:00Z\",\n  \"notes\": \"Morning practice session\",\n  \"requiresAdminApproval\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Booking",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/bookings/:bookingId"
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/bookings/:bookingId",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"cancelled\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Complete Booking",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/bookings/:bookingId",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Matches",
+      "item": [
+        {
+          "name": "List Matches",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/matches",
+              "query": [
+                {
+                  "key": "clubId",
+                  "value": "{{clubId}}"
+                },
+                {
+                  "key": "status",
+                  "value": "scheduled"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Match",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/matches/:matchId"
+          }
+        },
+        {
+          "name": "Create Match",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.id) {",
+                  "        pm.collectionVariables.set('matchId', response.data.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/matches",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clubId\": \"{{clubId}}\",\n  \"courtId\": \"{{courtId}}\",\n  \"sportId\": \"{{sportId}}\",\n  \"name\": \"Weekend Volleyball Match\",\n  \"startTime\": \"2026-05-02T14:00:00Z\",\n  \"endTime\": \"2026-05-02T16:00:00Z\",\n  \"requiredPlayers\": 6,\n  \"registrationOpenTime\": \"2026-04-28T00:00:00Z\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register for Match",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/matches/:matchId/register"
+          }
+        },
+        {
+          "name": "Withdraw from Match",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/matches/:matchId/withdraw"
+          }
+        },
+        {
+          "name": "Generate Teams",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/matches/:matchId/generate-teams"
+          }
+        },
+        {
+          "name": "Complete Match",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/matches/:matchId/complete",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"winnerTeam\": \"teamA\",\n  \"scoreSummary\": \"2-1\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Cancel Match",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/matches/:matchId/cancel"
+          }
+        },
+        {
+          "name": "Update Match",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/matches/:matchId",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Weekend Volleyball Match - Updated\",\n  \"startTime\": \"2026-05-02T15:00:00Z\",\n  \"endTime\": \"2026-05-02T17:00:00Z\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trainings",
+      "item": [
+        {
+          "name": "List Trainings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/trainings",
+              "query": [
+                {
+                  "key": "clubId",
+                  "value": "{{clubId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Training",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/trainings/:trainingId"
+          }
+        },
+        {
+          "name": "Create Training",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/trainings",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clubId\": \"{{clubId}}\",\n  \"courtId\": \"{{courtId}}\",\n  \"sportId\": \"{{sportId}}\",\n  \"coachUserId\": \"{{userId}}\",\n  \"name\": \"Beginner Volleyball Training\",\n  \"startTime\": \"2026-05-03T09:00:00Z\",\n  \"endTime\": \"2026-05-03T11:00:00Z\",\n  \"capacity\": 10,\n  \"registrationOpenTime\": \"2026-04-25T00:00:00Z\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register for Training",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/trainings/:trainingId/register"
+          }
+        },
+        {
+          "name": "Withdraw from Training",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/trainings/:trainingId/withdraw"
+          }
+        },
+        {
+          "name": "Cancel Training",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/trainings/:trainingId/cancel"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Events",
+      "item": [
+        {
+          "name": "List Events",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "query": [
+                {
+                  "key": "clubId",
+                  "value": "{{clubId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Event",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/events/:eventId"
+          }
+        },
+        {
+          "name": "Create Event",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/events",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clubId\": \"{{clubId}}\",\n  \"courtId\": \"{{courtId}}\",\n  \"title\": \"Annual Sports Day\",\n  \"description\": \"Join us for our annual sports day celebration with multiple activities\",\n  \"startTime\": \"2026-06-15T08:00:00Z\",\n  \"endTime\": \"2026-06-15T18:00:00Z\",\n  \"capacity\": 100,\n  \"locationText\": \"Main Sports Complex\",\n  \"paymentStatusMode\": \"free\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register for Event",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/events/:eventId/register"
+          }
+        },
+        {
+          "name": "Cancel Event Registration",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/events/:eventId/cancel"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get Club Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/stats/club/{{clubId}}"
+          }
+        },
+        {
+          "name": "Get Global Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/stats/global"
+          }
+        },
+        {
+          "name": "Get Pending Actions",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/pending"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Content",
+      "item": [
+        {
+          "name": "Create Page",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/content/pages",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clubId\": \"{{clubId}}\",\n  \"title\": \"About Us\",\n  \"slug\": \"about-us\",\n  \"content\": \"<h2>Welcome to our Club</h2><p>We are dedicated to promoting sports excellence...</p>\",\n  \"pageType\": \"about\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Page",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/content/pages/:pageId",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"About Us - Updated\",\n  \"content\": \"<h2>Welcome to our Enhanced Club</h2><p>We have expanded our facilities...</p>\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Pages by Club",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/content/clubs/{{clubId}}/pages"
+          }
+        },
+        {
+          "name": "Upsert External Link",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/content/clubs/{{clubId}}/links",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"WhatsApp Group\",\n  \"url\": \"https://chat.whatsapp.com/abc123\",\n  \"iconUrl\": \"https://example.com/icons/whatsapp.png\",\n  \"linkType\": \"social\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Links by Club",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/content/clubs/{{clubId}}/links"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Surveys",
+      "item": [
+        {
+          "name": "Create Survey",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/surveys",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clubId\": \"{{clubId}}\",\n  \"title\": \"Facility Satisfaction Survey\",\n  \"description\": \"Help us improve our facilities\",\n  \"isAnonymous\": false,\n  \"questions\": [\n    {\n      \"text\": \"How satisfied are you with our facilities?\",\n      \"type\": \"rating\",\n      \"required\": true\n    },\n    {\n      \"text\": \"What improvements would you suggest?\",\n      \"type\": \"text\",\n      \"required\": false\n    },\n    {\n      \"text\": \"Which sport do you primarily play?\",\n      \"type\": \"multiple_choice\",\n      \"options\": [\"Volleyball\", \"Football\", \"Swimming\", \"Basketball\"],\n      \"required\": true\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Publish Survey",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/surveys/:surveyId/publish",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"published\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Survey Responses",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/surveys/:surveyId/responses"
+          }
+        },
+        {
+          "name": "Submit Survey Response",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/surveys/:surveyId/responses",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": [\n    {\n      \"questionId\": \"question-uuid-1\",\n      \"value\": 5\n    },\n    {\n      \"questionId\": \"question-uuid-2\",\n      \"value\": \"More seating areas needed\"\n    },\n    {\n      \"questionId\": \"question-uuid-3\",\n      \"value\": \"Volleyball\"\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Create FAQ",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/surveys/faqs",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clubId\": \"{{clubId}}\",\n  \"question\": \"What are the operating hours?\",\n  \"answer\": \"We are open from 6 AM to 10 PM daily.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List FAQs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/surveys/clubs/{{clubId}}/faqs"
+          }
+        },
+        {
+          "name": "Submit Private Question",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/surveys/clubs/{{clubId}}/private-questions",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Can I get a refund for my membership?\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Answer Private Question",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/surveys/private-questions/:questionId/answer",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": \"Yes, refunds are processed within 7 business days.\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Player Ratings",
+      "item": [
+        {
+          "name": "Rate Player",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/ratings/players/:playerId/rate",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4,\n  \"matchId\": \"{{matchId}}\",\n  \"comment\": \"Great teamwork and communication\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Player Ratings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/ratings/players/:playerId/ratings"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Points",
+      "item": [
+        {
+          "name": "Get Balance",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/points/balance",
+            "query": [
+              {
+                "key": "clubId",
+                "value": "{{clubId}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get History",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/points/history",
+              "query": [
+                {
+                  "key": "clubId",
+                  "value": "{{clubId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Reward",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/rewards",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clubId\": \"{{clubId}}\",\n  \"name\": \"Free Court Booking\",\n  \"pointsCost\": 500,\n  \"description\": \"One hour of free court time\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Rewards",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/rewards",
+            "query": [
+              {
+                "key": "clubId",
+                "value": "{{clubId}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Redeem Reward",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/rewards/:rewardId/redeem"
+          }
+        },
+        {
+          "name": "Get Pending Redemptions",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/redemptions/pending",
+            "query": [
+              {
+                "key": "clubId",
+                "value": "{{clubId}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Decide Redemption",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/admin/redemptions/:redemptionId/decision",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"approved\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Award Points (Admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/points/admin/award",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"clubId\": \"{{clubId}}\",\n  \"amount\": 100,\n  \"reason\": \"Outstanding performance at tournament\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Send Notification",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/notifications",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clubId\": \"{{clubId}}\",\n  \"title\": \"New Match Scheduled\",\n  \"message\": \"A new volleyball match has been scheduled for this Saturday\",\n  \"type\": \"info\",\n  \"targetType\": \"club\",\n  \"targetUsers\": []\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/notifications/me",
+              "query": [
+                {
+                  "key": "unreadOnly",
+                  "value": "false"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark Notification Read",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/notifications/:notificationId/read"
+          }
+        },
+        {
+          "name": "Mark All Notifications Read",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/notifications/read-all"
+          }
+        }
+      ]
+    }
+  ]
+}
