@@ -14,7 +14,10 @@ const registerValidation = [
     .matches(/^\+\d{10,15}$/).withMessage('Invalid phone number'),
   body('password')
     .notEmpty().withMessage('Password is required')
-    .isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
+    .isLength({ min: 8, max: 10 }).withMessage('Password must be between 8 and 10 characters')
+    .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
+    .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
+    .matches(/[0-9]/).withMessage('Password must contain at least one digit'),
   body('dob').optional().isISO8601().toDate().withMessage('Invalid date of birth'),
   body('gender')
     .optional()
@@ -74,8 +77,14 @@ const resetPasswordValidation = [
   body('password')
     .notEmpty()
     .withMessage('New password is required')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters'),
+    .isLength({ min: 8, max: 10 })
+    .withMessage('Password must be between 8 and 10 characters')
+    .matches(/[A-Z]/)
+    .withMessage('Password must contain at least one uppercase letter')
+    .matches(/[a-z]/)
+    .withMessage('Password must contain at least one lowercase letter')
+    .matches(/[0-9]/)
+    .withMessage('Password must contain at least one digit'),
   body('confirmPassword')
     .notEmpty()
     .withMessage('Password confirmation is required')

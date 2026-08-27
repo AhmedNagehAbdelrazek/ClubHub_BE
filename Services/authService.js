@@ -105,7 +105,6 @@ async function register({ name, phone, password, dob = null, gender = null }) {
   }
 
   const password_hash = await bcrypt.hash(password, 10);
-  console.log(password, password_hash);
   const user = await User.create({
     name,
     phone,
@@ -114,7 +113,6 @@ async function register({ name, phone, password, dob = null, gender = null }) {
     gender,
     global_role: 'user',
   });
-  console.log('Created user:', user);
 
   const token = generateToken(user);
   return { user, token };
@@ -130,8 +128,6 @@ async function login(phone, password) {
   }
 
   const isMatch = await bcrypt.compare(password, user.password_hash);
-  console.log('Password match:', isMatch);
-  console.log(password, user.password_hash);
   if (!isMatch) {
     throw ApiErrors.unauthorized('Invalid credentials, incorrect password');
   }

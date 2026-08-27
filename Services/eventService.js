@@ -141,7 +141,7 @@ async function cancelEventRegistration(eventId, userId) {
   if (event.capacity) {
     const waitingParticipant = await EventParticipant.findOne({
       where: { event_id: eventId, status: 'waiting' },
-      order: [['created_at', 'ASC']],
+      order: [['createdat', 'ASC']],
     });
 
     if (waitingParticipant) {

@@ -60,9 +60,9 @@ module.exports = {
         defaultValue: 'scheduled',
         field: 'status',
       },
-      created_at: {
+      createdat: {
         allowNull: false,
-        field: 'created_at',
+        field: 'createdat',
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },

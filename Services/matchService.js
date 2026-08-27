@@ -1,6 +1,6 @@
 const { Match, MatchRegistration, Court, Membership, sequelize } = require('../Models');
 const { ApiErrors } = require('../utils/ApiError');
-const { ROLES } = require('../config/constants');
+const { ROLES, CLUB_ROLES } = require('../config/constants');
 const scheduleConflictService = require('./scheduleConflictService');
 const teamDraft = require('../utils/teamDraft');
 
@@ -9,9 +9,8 @@ const teamDraft = require('../utils/teamDraft');
  */
 async function assertMatchAdmin(user, clubId) {
   if (user.globalRole === ROLES.SUPER_ADMIN) return true;
-  const Membership = require('../Models/Membership');
   const membership = await Membership.findOne({
-    where: { user_id: user.id, club_id: clubId, club_role: 'club_admin', status: 'approved' },
+    where: { user_id: user.id, club_id: clubId, club_role: CLUB_ROLES.CLUB_ADMIN, status: 'approved' },
   });
   if (!membership) throw ApiErrors.forbidden('Club admin access required for match management');
   return true;
@@ -180,80 +179,94 @@ async function generateTeams(matchId) {
 /**
  * Register current user for a match.
  * Handles waitlist promotion when capacity reached.
+ * Uses transaction to prevent race conditions.
  */
 async function registerForMatch(matchId, userId) {
-  const match = await Match.findByPk(matchId, {
-    include: [{ model: MatchRegistration, as: 'registrations' }],
-  });
-  if (!match) throw ApiErrors.notFound('Match not found');
+  const t = await sequelize.transaction();
 
-  // Only allow registration if match is scheduled and registration open
-  if (match.status !== 'scheduled') {
-    throw ApiErrors.badRequest('Match is not open for registration');
-  }
-  if (new Date() < new Date(match.registration_open_time)) {
-    throw ApiErrors.badRequest('Registration not yet open');
-  }
-
-  // Check existing registration
-  const existing = await MatchRegistration.findOne({
-    where: { match_id: matchId, user_id: userId },
-  });
-  if (existing) {
-    if (existing.status === 'main') {
-      throw ApiErrors.conflict('Already registered for this match');
-    }
-    if (existing.status === 'withdrawn') {
-      // Reactivate if within policy (e.g., re-join waitlist)
-      existing.status = 'waiting';
-      await existing.save();
-      // Attempt promotion immediately
-      return await promoteWaitlist(matchId);
-    }
-  }
-
-  const mainCount = match.registrations.filter((r) => r.status === 'main').length;
-
-  if (mainCount < match.required_players) {
-    // Direct registration
-    const registration = await MatchRegistration.create({
-      match_id: matchId,
-      user_id: userId,
-      status: 'main',
-      registration_time: new Date(),
+  try {
+    const match = await Match.findByPk(matchId, {
+      include: [{ model: MatchRegistration, as: 'registrations' }],
+      transaction: t,
+      lock: t.LOCK.UPDATE,
     });
-    return registration;
-  } else {
-    // Waitlist
-    const registration = await MatchRegistration.create({
-      match_id: matchId,
-      user_id: userId,
-      status: 'waiting',
-      registration_time: new Date(),
+    if (!match) {
+      await t.rollback();
+      throw ApiErrors.notFound('Match not found');
+    }
+
+    if (match.status !== 'scheduled') {
+      await t.rollback();
+      throw ApiErrors.badRequest('Match is not open for registration');
+    }
+    if (new Date() < new Date(match.registration_open_time)) {
+      await t.rollback();
+      throw ApiErrors.badRequest('Registration not yet open');
+    }
+
+    const existing = await MatchRegistration.findOne({
+      where: { match_id: matchId, user_id: userId },
+      transaction: t,
     });
-    return registration;
+    if (existing) {
+      if (existing.status === 'main') {
+        await t.rollback();
+        throw ApiErrors.conflict('Already registered for this match');
+      }
+      if (existing.status === 'withdrawn') {
+        existing.status = 'waiting';
+        await existing.save({ transaction: t });
+        const result = await promoteWaitlist(matchId, t);
+        await t.commit();
+        return result;
+      }
+    }
+
+    const mainCount = match.registrations.filter((r) => r.status === 'main').length;
+
+    if (mainCount < match.required_players) {
+      const registration = await MatchRegistration.create({
+        match_id: matchId,
+        user_id: userId,
+        status: 'main',
+        registration_time: new Date(),
+      }, { transaction: t });
+      await t.commit();
+      return registration;
+    } else {
+      const registration = await MatchRegistration.create({
+        match_id: matchId,
+        user_id: userId,
+        status: 'waiting',
+        registration_time: new Date(),
+      }, { transaction: t });
+      await t.commit();
+      return registration;
+    }
+  } catch (err) {
+    await t.rollback();
+    throw err;
   }
 }
 
 /**
  * When a registration is cancelled or withdrawn, promote next waitlisted user.
  */
-async function promoteWaitlist(matchId) {
+async function promoteWaitlist(matchId, transaction) {
   const match = await Match.findByPk(matchId, {
     include: [{ model: MatchRegistration, as: 'registrations', where: { status: 'waiting' }, order: [['registration_time', 'ASC']] }],
+    transaction,
   });
   if (!match) return;
 
   const mainCount = match.registrations.filter((r) => r.status === 'main').length;
-  if (mainCount >= match.required_players) return; // No space
+  if (mainCount >= match.required_players) return;
 
-  // Promote the earliest waitlisted user
   const next = match.registrations[0];
   if (next) {
     next.status = 'main';
-    await next.save();
-    // Recursively check if more spots opened (e.g., if required_players increased)
-    await promoteWaitlist(matchId);
+    await next.save({ transaction });
+    await promoteWaitlist(matchId, transaction);
   }
 }
 
@@ -261,19 +274,30 @@ async function promoteWaitlist(matchId) {
  * Withdraw from a match registration.
  */
 async function withdrawRegistration(matchId, userId) {
-  const registration = await MatchRegistration.findOne({
-    where: { match_id: matchId, user_id: userId, status: 'main' },
-  });
-  if (!registration) throw ApiErrors.notFound('Active registration not found');
+  const t = await sequelize.transaction();
 
-  registration.status = 'withdrawn';
-  registration.withdrawn_at = new Date();
-  await registration.save();
+  try {
+    const registration = await MatchRegistration.findOne({
+      where: { match_id: matchId, user_id: userId, status: 'main' },
+      transaction: t,
+    });
+    if (!registration) {
+      await t.rollback();
+      throw ApiErrors.notFound('Active registration not found');
+    }
 
-  // Trigger waitlist promotion
-  await promoteWaitlist(matchId);
+    registration.status = 'withdrawn';
+    registration.withdrawn_at = new Date();
+    await registration.save({ transaction: t });
 
-  return registration;
+    await promoteWaitlist(matchId, t);
+
+    await t.commit();
+    return registration;
+  } catch (err) {
+    await t.rollback();
+    throw err;
+  }
 }
 
 module.exports = {

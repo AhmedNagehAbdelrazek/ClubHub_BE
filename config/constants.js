@@ -1,7 +1,10 @@
 module.exports = {
-  // Global user roles
   ROLES: {
+    GUEST: 'guest',
     USER: 'user',
+    PENDING_MEMBER: 'pending_member',
+    APPROVED_MEMBER: 'approved_member',
+    CLUB_ADMIN: 'club_admin',
     SUPER_ADMIN: 'super_admin',
   },
 

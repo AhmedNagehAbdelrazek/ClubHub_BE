@@ -143,9 +143,9 @@ The plan must respect and expand within this structure. No drastic re‑organiza
 - **Seeds:** For initial data (roles, sports, test clubs), use seed files.
 - **Naming:**
   - Tables: `snake_case`, plural (`users`, `clubs`, `court_bookings`).
-  - Columns: `snake_case` (`created_at`, `hourly_price`).
+  - Columns: `snake_case` (`createdat`, `hourly_price`).
   - Foreign keys: `referenced_table_name_id` (e.g., `club_id`, `court_id`).
-- **Timestamps:** Every table must include `created_at` and `updated_at` (Sequelize default).
+- **Timestamps:** Every table must include `createdat` and `updated_at` (Sequelize default).
 - **Soft deletes:** For entities that users might need to restore (surveys, events), use `deleted_at` (paranoid mode).
 
 ## 7. Authentication & Authorization

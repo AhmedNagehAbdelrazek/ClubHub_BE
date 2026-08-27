@@ -28,9 +28,9 @@ module.exports = {
         defaultValue: 0,
         field: 'order_index',
       },
-      created_at: {
+      createdat: {
         allowNull: false,
-        field: 'created_at',
+        field: 'createdat',
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },

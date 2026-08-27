@@ -49,9 +49,9 @@ module.exports = {
         references: { model: 'users', key: 'id' },
         field: 'decided_by',
       },
-      created_at: {
+      createdat: {
         allowNull: false,
-        field: 'created_at',
+        field: 'createdat',
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },

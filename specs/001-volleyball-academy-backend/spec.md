@@ -229,21 +229,21 @@ Users earn points automatically for match wins, attendance, and optionally for c
 - **FR‑200:** Web panel for super_admin and club_admin, with data scoping.
 
 ### Key Entities
-- **User**: id, name, phone, DOB, gender, password_hash, profile_picture_url, created_at.
+- **User**: id, name, phone, DOB, gender, password_hash, profile_picture_url, createdat.
 - **Club**: id, name, logo_url, location, settings.
 - **Sport**: id, name, icon_url, players_per_team.
 - **ClubSport**: club_id, sport_id.
 - **Court**: id, club_id, name, capacity, hourly_price, surface_type, indoor/outdoor.
 - **CourtSupportedSport**: court_id, sport_id (many‑to‑many).
 - **Membership**: id, user_id, club_id, status (pending, approved, rejected, deactivated), joined_at.
-- **CourtBooking**: id, court_id, user_id, start_time, end_time, status (confirmed, cancelled), created_at.
+- **CourtBooking**: id, court_id, user_id, start_time, end_time, status (confirmed, cancelled), createdat.
 - **Match**: id, club_id, court_id, sport_id, name, date, time, required_players, registration_open_time, status, fixed_player_ids.
 - **MatchRegistration**: id, match_id, user_id, status (main, waiting, withdrawn, confirmed), registration_time.
 - **Training**: same pattern as Match.
 - **Event**: similar with optional court.
 - **PointsLedger**: id, user_id, club_id, amount, reason, source (manual, match_win, attendance, booking), timestamp.
 - **Reward**: id, club_id, name, points_cost, description.
-- **Redemption**: id, user_id, reward_id, status (pending, approved, rejected), created_at.
+- **Redemption**: id, user_id, reward_id, status (pending, approved, rejected), createdat.
 - **Survey**, **Question**, **SurveyResponse**, **FAQ**, **PrivateQuestion**, **StaticPage**, **ExternalLinks** – all club‑scoped (except global optional).
 - **Notification**: id, club_id (nullable), target_type, target_users[], title, message, sent_at.
 

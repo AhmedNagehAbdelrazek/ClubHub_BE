@@ -48,6 +48,12 @@ function createApp() {
 
   app.use(globalErrorHandler);
 
+  // Temporary route for route extraction (remove later)
+  app.get('/__dump_routes', (req, res) => {
+    const listEndpoints = require('express-list-endpoints');
+    const endpoints = listEndpoints(app);
+    res.json(endpoints);
+  });
   return app;
 }
 

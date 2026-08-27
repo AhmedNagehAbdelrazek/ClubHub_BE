@@ -50,7 +50,7 @@ async function getPlayerRatings(playerId, requestingUser) {
       { model: Match, as: 'match' },
       { model: User, as: 'rater' },
     ],
-    order: [['created_at', 'DESC']],
+    order: [['createdat', 'DESC']],
   });
 
   if (requestingUser.id === playerId || requestingUser.globalRole === 'super_admin') {

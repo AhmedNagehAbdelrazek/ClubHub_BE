@@ -2,6 +2,7 @@ const { Court, CourtBooking, Membership } = require('../Models');
 const scheduleConflictService = require('./scheduleConflictService');
 const { ApiErrors } = require('../utils/ApiError');
 const { sequelize } = require('../Models');
+const { CLUB_ROLES } = require('../config/constants');
 
 /**
  * Verify user membership in club
@@ -92,7 +93,7 @@ async function cancelBooking(bookingId, user) {
         where: {
           user_id: user.id,
           club_id: booking.club_id,
-          club_role: 'club_admin',
+          club_role: CLUB_ROLES.CLUB_ADMIN,
           status: 'approved',
         },
       });
@@ -126,7 +127,7 @@ async function completeBooking(bookingId, user) {
       where: {
         user_id: user.id,
         club_id: booking.club_id,
-        club_role: 'club_admin',
+        club_role: CLUB_ROLES.CLUB_ADMIN,
         status: 'approved',
       },
     });

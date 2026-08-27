@@ -5,7 +5,7 @@
 - Database: PostgreSQL via Sequelize.
 - Naming: snake_case tables/columns, plural table names.
 - IDs: UUID or big integer (implementation choice to be fixed per migration style), consistent across relations.
-- Timestamps: `created_at`, `updated_at` on all tables.
+- Timestamps: `createdat`, `updated_at` on all tables.
 - Soft delete (`deleted_at`) for recoverable entities (e.g., surveys/events/content where business requires restore/history).
 
 ## Core Entities
@@ -220,7 +220,7 @@
 - `source` (enum: `manual`, `match_win`, `attendance`, `booking`, `redemption`)
 - `reason` (text)
 - `reference_type` / `reference_id` (nullable polymorphic link)
-- `created_at`
+- `createdat`
 
 ### 16) `rewards`
 
@@ -324,6 +324,6 @@
 - Suggested indexes:
   - time-range query support on schedule tables by (`court_id`, `start_time`, `end_time`, `status`)
   - membership lookup by (`user_id`, `club_id`, `status`)
-  - notifications by (`user_id`, `read_at`, `created_at`)
+  - notifications by (`user_id`, `read_at`, `createdat`)
 - Conflict handling:
   - scheduling writes must run in transactions with overlap checks and deterministic `409 Conflict` responses.

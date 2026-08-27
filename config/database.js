@@ -19,11 +19,12 @@ async function validateDatabase() {
   try {
     await tempSequelize.authenticate();
     const [results] = await tempSequelize.query(
-      `SELECT 1 FROM pg_database WHERE datname = '${dbConfig.database}'`
+      'SELECT 1 FROM pg_database WHERE datname = $1',
+      { bind: [dbConfig.database] }
     );
 
     if (results.length === 0) {
-      await tempSequelize.query(`CREATE DATABASE ${dbConfig.database}`);
+      await tempSequelize.query(`CREATE DATABASE "${dbConfig.database}"`);
       console.log(`Database ${dbConfig.database} created.`);
     }
   } catch (error) {

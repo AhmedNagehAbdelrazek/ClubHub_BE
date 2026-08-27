@@ -69,7 +69,7 @@ async function getSurveyResponses(surveyId, user) {
   const responses = await SurveyResponse.findAll({
     where: { survey_id: surveyId },
     include: [{ model: SurveyQuestion, as: 'question' }, { model: require('../Models/User'), as: 'user', attributes: ['id', 'name'] }],
-    order: [['created_at', 'DESC']],
+    order: [['createdat', 'DESC']],
   });
 
   return responses;

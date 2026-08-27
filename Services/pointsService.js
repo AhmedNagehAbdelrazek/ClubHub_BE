@@ -48,7 +48,7 @@ async function getPointsHistory(userId, { clubId, limit = 50, offset = 0 } = {})
     where,
     limit: parseInt(limit),
     offset: parseInt(offset),
-    order: [['created_at', 'DESC']],
+    order: [['createdat', 'DESC']],
   });
 
   const total = await PointsLedger.count({ where });

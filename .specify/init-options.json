@@ -1,9 +1,9 @@
 {
-  "ai": "kilocode",
+  "ai": "opencode",
   "branch_numbering": "sequential",
-  "context_file": ".kilocode/rules/specify-rules.md",
+  "context_file": "AGENTS.md",
   "here": true,
-  "integration": "kilocode",
+  "integration": "opencode",
   "script": "ps",
   "speckit_version": "0.8.2.dev0"
 }

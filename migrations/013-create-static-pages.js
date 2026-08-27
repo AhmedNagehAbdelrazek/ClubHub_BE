@@ -32,9 +32,9 @@ module.exports = {
         allowNull: true,
         field: 'attachment_url',
       },
-      created_at: {
+      createdat: {
         allowNull: false,
-        field: 'created_at',
+        field: 'createdat',
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },

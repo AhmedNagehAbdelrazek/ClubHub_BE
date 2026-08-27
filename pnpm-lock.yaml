@@ -84,6 +84,9 @@ importers:
       eslint:
         specifier: ^10.1.0
         version: 10.2.1
+      express-list-endpoints:
+        specifier: ^7.1.1
+        version: 7.1.1
       globals:
         specifier: ^17.4.0
         version: 17.5.0
@@ -1547,6 +1550,10 @@ packages:
 
   express-async-handler@1.2.0:
     resolution: {integrity: sha512-rCSVtPXRmQSW8rmik/AIb2P0op6l7r1fMW538yyvTMltCO4xQEWMmobfrIxN2V1/mVrgxB8Az3reYF6yUZw37w==}
+
+  express-list-endpoints@7.1.1:
+    resolution: {integrity: sha512-SA6YHH1r6DrioJ4fFJNqiwu1FweGFqJZO9KBApMzwPosoSGPOX2AW0wiMepOXjojjEXDuP9whIvckomheErbJA==}
+    engines: {node: '>=18'}
 
   express-validator@7.3.2:
     resolution: {integrity: sha512-ctLw1Vl6dXVH62dIQMDdTAQkrh480mkFuG6/SGXOaVlwPNukhRAe7EgJIMJ2TSAni8iwHBRp530zAZE5ZPF2IA==}
@@ -4896,6 +4903,8 @@ snapshots:
       jest-util: 30.3.0
 
   express-async-handler@1.2.0: {}
+
+  express-list-endpoints@7.1.1: {}
 
   express-validator@7.3.2:
     dependencies:
